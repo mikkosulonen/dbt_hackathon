@@ -5,11 +5,18 @@ This is the repo for [Recordly](https://www.recordlydata.com) data build tool ha
 The structure of the repo is the following:
 * This README.md is an introduction on how to get started
 * [/general](/general) contains supporting material about data build tool. Kinda like Powerpoints, but in Markdown.
-* [/business_case](/business_case) has the business case at hand
+* [/business_case](/business_case) has the business case and instructions
 * [/examples](/examples) has some examples to get you going if you feel stuck
 * [/finished](/finished) has the answers. So major SPOILERS there :)
 
 This hackathon was done on Snowflake using TPC-H dataset as an example. https://github.com/electrum/tpch-dbgen was used to generate new data made available to participants via Azure Blob storage.
+
+The goal for this dbt hackathon is 
+* to give basic idea about what dbt does, 
+* what it doesn't do, 
+* how to set it up and start  using it, 
+* how to expand it with packages and macros, 
+* and what to consider when creating a production ready environment
 
 ## Recordly hackathon?
 
