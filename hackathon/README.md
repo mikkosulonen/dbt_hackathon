@@ -14,10 +14,17 @@ This is the main folder what you should be looking at while doing. This README.m
     - [Publish](#publish)
       - [Grants for end users](#grants-for-end-users)
     - [Documentation](#documentation)
+    - [Expanding on what we did, and other nice stuff to mention](#expanding-on-what-we-did-and-other-nice-stuff-to-mention)
+      - [Snapshots](#snapshots)
+      - [Hooks](#hooks)
+      - [Macros](#macros)
+      - [Packages](#packages)
+      - [Exposures](#exposures)
+      - [Analyses](#analyses)
 
 ## Business case
 
-> Your task is to create well documented and tested data sets from the HTPC-H data set. A persistent staging is provided
+> Your task is to create well documented and tested data sets from the HTPC-H data set. A persistent staging is provided.
 
 ### Starting a dbt project
 
@@ -69,3 +76,17 @@ Primary / foreign key references.
 ### Documentation
 
 Document data lineage and published data sets.
+
+### Expanding on what we did, and other nice stuff to mention
+
+#### Snapshots
+
+#### Hooks
+
+#### Macros
+
+#### Packages
+
+#### Exposures
+
+#### Analyses
