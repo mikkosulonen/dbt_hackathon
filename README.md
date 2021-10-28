@@ -5,7 +5,7 @@ This is the repo for [Recordly](https://www.recordlydata.com) data build tool ha
 The structure of the repo is the following:
 * This README.md is an introduction on how to get started
 * [/general](/general) contains supporting material about data build tool. Kinda like Powerpoints, but in Markdown.
-* [/business_case](/business_case) has the business case and instructions
+* [/hackathon](/business_case) has the business case and instructions
 * [/examples](/examples) has some examples to get you going if you feel stuck
 * [/finished](/finished) has the answers. So major SPOILERS there :)
 
