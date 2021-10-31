@@ -14,13 +14,13 @@ The goal for this dbt hackathon is
 - [General - Recordly dbt hackathon 4.11.2021](#general---recordly-dbt-hackathon-4112021)
   - [dbt - data build tool](#dbt---data-build-tool)
     - [What dbt does, What dbt kinda does, What dbt doesn't do](#what-dbt-does-what-dbt-kinda-does-what-dbt-doesnt-do)
-    - [dbt setup and usage - dbt project](#dbt-setup-and-usage---dbt-project)
-      - [Connecting to a database - adapters and profile.yml](#connecting-to-a-database---adapters-and-profileyml)
-      - [Running dbt - cli and cli commands](#running-dbt---cli-and-cli-commands)
-        - [cli command modifiers / arguments](#cli-command-modifiers--arguments)
-    - [Expanding dbt - macros, Jinja, and packages](#expanding-dbt---macros-jinja-and-packages)
-    - [Considerations when deploying to prod](#considerations-when-deploying-to-prod)
-      - [dbt "build" artifacts](#dbt-build-artifacts)
+  - [dbt setup and usage - dbt project](#dbt-setup-and-usage---dbt-project)
+    - [Connecting to a database - adapters and profile.yml](#connecting-to-a-database---adapters-and-profileyml)
+    - [Running dbt - cli and cli commands](#running-dbt---cli-and-cli-commands)
+      - [cli command modifiers / arguments](#cli-command-modifiers--arguments)
+  - [Expanding dbt - macros, Jinja, and packages](#expanding-dbt---macros-jinja-and-packages)
+  - [Considerations when deploying to prod](#considerations-when-deploying-to-prod)
+    - [dbt "build" artifacts](#dbt-build-artifacts)
 
 ## dbt - data build tool
 
@@ -28,16 +28,16 @@ The goal for this dbt hackathon is
 ### What dbt does, What dbt kinda does, What dbt doesn't do
 
 Please read my earlier blog post about *Positioning data build tool* in [data.solita.fi blog](https://data.solita.fi/positioning-data-build-tool-dbt-in-the-data-tooling-landscape/)
-### dbt setup and usage - dbt project
+## dbt setup and usage - dbt project
 
-#### Connecting to a database - adapters and profile.yml
+### Connecting to a database - adapters and profile.yml
 
-#### Running dbt - cli and cli commands
+### Running dbt - cli and cli commands
 
-##### cli command modifiers / arguments
+#### cli command modifiers / arguments
 
-### Expanding dbt - macros, Jinja, and packages
+## Expanding dbt - macros, Jinja, and packages
 
-### Considerations when deploying to prod
+## Considerations when deploying to prod
 
-#### dbt "build" artifacts
+### dbt "build" artifacts
