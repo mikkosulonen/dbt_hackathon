@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: tpc
+    schema: src
+    tables:
+      - name: customer
+      - name: lineitem
+      - name: nation
+      - name: orders
+      - name: part
+      - name: partsupp
+      - name: supplier
