@@ -40,6 +40,13 @@ models:
       +materialized: view
       tpc:
         +materialized: table
+    publish:
+      +schema: publish
+      +materialized: view
+      +post-hook:
+        - "grant select on {{ this }} to role power_bi_role"
+        - "grant usage on schema {{ schema }} to role power_bi_role"
+
 
 seeds:
   dbt_hackathon:

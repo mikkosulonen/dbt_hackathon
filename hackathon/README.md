@@ -18,9 +18,7 @@ This is the main folder what you should be looking at while doing. This README.m
     - [Documentation](#documentation)
     - [Running to prod](#running-to-prod)
     - [Expanding on what we did, and other nice stuff to mention](#expanding-on-what-we-did-and-other-nice-stuff-to-mention)
-      - [Snapshots](#snapshots)
-      - [Hooks](#hooks)
-      - [Macros](#macros)
+      - [Macros, hooks](#macros-hooks)
       - [Packages](#packages)
       - [Exposures](#exposures)
       - [Analyses](#analyses)
@@ -36,6 +34,8 @@ This is the main folder what you should be looking at while doing. This README.m
 **macOS**
 
 While https://github.com/dbt-labs/dbt-snowflake/issues/19 and https://github.com/snowflakedb/snowflake-connector-python/issues/799 are open, we need to install x64 Homebrew and x64 dbt. Sadly. 
+
+*(As of writing this, arm64 dbt seems to be working with the commands we need in this excersise. Your mileage may vary.)*
 ```bash
 # Install Homebrew for x86_64 architecture
 # https://soffes.blog/homebrew-on-apple-silicon
@@ -142,11 +142,11 @@ dbt_project.yml is the place for configuring your project. For now, we are inter
 
 ```bash
 cd <where_dbt_project.yml is located>
-idbt debug
+dbt debug
 ```
 If everything is working, you should see the following:
 ```bash
-❯ idbt debug
+❯ dbt debug
 Running with dbt=0.21.0
 dbt version: 0.21.0
 python version: 3.8.12
@@ -431,7 +431,7 @@ And let's delete the example folder and it's contents.
 Now we are ready to run something!
 
 ```
-❯ idbt run
+❯ dbt run
 Running with dbt=0.21.0
 Found 1 model, 0 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 0 seed files, 7 sources, 0 exposures
 
@@ -481,7 +481,7 @@ Hint: https://docs.getdbt.com/reference/model-configs and use "Config block". Ev
 If you need help, [finished project folder](/finished/dbt_hackathon/models/staging/tpc/stg_lineitem.sql) has a working jinja-sql file.
 
 ```
-❯ idbt run
+❯ dbt run
 Running with dbt=0.21.0
 Found 2 models, 0 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 0 seed files, 7 sources, 0 exposures
 
@@ -502,7 +502,7 @@ Done. PASS=2 WARN=0 ERROR=0 SKIP=0 TOTAL=2
 But now we have a bottleneck. We don't want to keep running a long running table if we didn't make any changes to it. Here's where the ```Node selector``` syntax comes in: https://docs.getdbt.com/reference/node-selection/syntax
 
 ```
-❯ idbt run --select stg_lineitem
+❯ dbt run --select stg_lineitem
 Running with dbt=0.21.0
 Found 2 models, 0 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 0 seed files, 7 sources, 0 exposures
 
@@ -545,10 +545,10 @@ Use reference data from the [region.csv](region.csv) to add a column.
       dbt_hackathon:
       schema: ref
     ```
-* ```idbt seed```
+* ```dbt seed```
 
 ```
-❯ idbt seed
+❯ dbt seed
 Running with dbt=0.21.0
 Found 2 models, 0 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 1 seed file, 7 sources, 0 exposures
 
@@ -571,30 +571,195 @@ Done. PASS=1 WARN=0 ERROR=0 SKIP=0 TOTAL=1
 ```
 ### Publish
 
-**Create a new customer table with data from source-nation and seed-region added**
+**Create a new customer table in publish schema with data from source-nation and seed-region added**
+
+* Update ```dbt_project.yml``` with schema naming
+* Use model specific config block.
+* Use ref-syntax! https://docs.getdbt.com/reference/dbt-jinja-functions/ref
 
 **Create publish schema views on all other src-tables**
 
-**Create a test for PARTKEY being not null and unique in part-view**
+* Update ```dbt_project.yml``` with materialization being views.
+
+**Create a test for PARTKEY in PART being not null and unique in part-view**
 
 **Create a test for orders containing only existing customers**
+
+https://docs.getdbt.com/docs/building-a-dbt-project/tests
+
+
+```
+❯ dbt test
+Running with dbt=0.21.0
+Found 8 models, 3 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 1 seed file, 7 sources, 0 exposures
+
+09:46:18 | Concurrency: 2 threads (target='dev')
+09:46:18 | 
+09:46:18 | 1 of 3 START test not_null_part_p_partkey............................ [RUN]
+09:46:18 | 2 of 3 START test relationships_orders_o_custkey__c_custkey__ref_customer_ [RUN]
+09:46:20 | 1 of 3 PASS not_null_part_p_partkey.................................. [PASS in 2.75s]
+09:46:20 | 3 of 3 START test unique_part_p_partkey.............................. [RUN]
+09:46:21 | 2 of 3 PASS relationships_orders_o_custkey__c_custkey__ref_customer_. [PASS in 3.16s]
+09:46:22 | 3 of 3 PASS unique_part_p_partkey.................................... [PASS in 1.42s]
+09:46:22 | 
+09:46:22 | Finished running 3 tests in 6.29s.
+
+Completed successfully
+
+Done. PASS=3 WARN=0 ERROR=0 SKIP=0 TOTAL=3
+```
+
+Looking at Snowflake query history, we can see what kind of queries are actually generated:
+
+```sql
+select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+    
+
+with child as (
+    select o_custkey as from_field
+    from mikko_dev_db.mikko_publish.orders
+    where o_custkey is not null
+),
+
+parent as (
+    select c_custkey as to_field
+    from mikko_dev_db.mikko_publish.customer
+)
+
+select
+    from_field
+
+from child
+left join parent
+    on child.from_field = parent.to_field
+
+where parent.to_field is null
+
+
+
+      
+    ) dbt_internal_test
+```
+
 #### Grants for end users
+
+Creating publish entities is just one thing. We alos need to make them available for end users / tools. This is where different dbt hooks come into play.
+
+https://docs.getdbt.com/docs/building-a-dbt-project/hooks-operations
+
+* Create a post-hook on publish models to grant select on each model to role ```power_bi_role``` (which is already created in Snowflake).
+* Create a post-hook to grant usage on the publish schema.
+* Run ```dbt run``` on only publish models to apply grants.
+* Verify from Snowflake UI.
 
 ### Documentation
 
-Document data lineage and published data sets.
+**Document data lineage and data sets.**
+
+```
+❯ dbt docs generate
+Running with dbt=0.21.0
+Found 8 models, 3 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 1 seed file, 7 sources, 0 exposures
+
+10:26:07 | Concurrency: 2 threads (target='dev')
+10:26:07 | 
+10:26:07 | Done.
+10:26:07 | Building catalog
+10:26:09 | Catalog written to /Users/mikko.sulonen/src/hackathon/dbt_hackathon/finished/dbt_hackathon/target/catalog.json
+```
+
+```
+❯ dbt docs serve
+Running with dbt=0.21.0
+Serving docs at 0.0.0.0:8080
+To access from your browser, navigate to:  http://localhost:8080
+Press Ctrl+C to exit.
+```
+
+https://docs.getdbt.com/docs/building-a-dbt-project/documentation
+
+
 
 ### Running to prod
+
+Add a ```prod``` block to ```~/.dbt/profiles.yml```. Same info, but change the db to be nnn_prod_db.
+
+```
+❯ dbt build --target prod 
+Running with dbt=0.21.0
+Found 8 models, 3 tests, 0 snapshots, 0 analyses, 172 macros, 0 operations, 1 seed file, 7 sources, 0 exposures
+
+10:39:20 | Concurrency: 2 threads (target='prod')
+10:39:20 | 
+10:39:20 | 1 of 12 START view model mikko_publish.orders........................ [RUN]
+10:39:20 | 2 of 12 START view model mikko_publish.part.......................... [RUN]
+10:39:22 | 1 of 12 OK created view model mikko_publish.orders................... [SUCCESS 1 in 1.62s]
+10:39:22 | 3 of 12 START view model mikko_publish.partsupp...................... [RUN]
+10:39:22 | 2 of 12 OK created view model mikko_publish.part..................... [SUCCESS 1 in 1.65s]
+10:39:22 | 4 of 12 START table model mikko_stg.stg_customer..................... [RUN]
+10:39:24 | 3 of 12 OK created view model mikko_publish.partsupp................. [SUCCESS 1 in 1.91s]
+10:39:24 | 5 of 12 START view model mikko_stg.stg_lineitem...................... [RUN]
+10:39:25 | 5 of 12 OK created view model mikko_stg.stg_lineitem................. [SUCCESS 1 in 1.28s]
+10:39:25 | 6 of 12 START view model mikko_publish.supplier...................... [RUN]
+10:39:27 | 6 of 12 OK created view model mikko_publish.supplier................. [SUCCESS 1 in 1.67s]
+10:39:27 | 7 of 12 START seed file mikko_ref.region............................. [RUN]
+* Deprecation Warning: The quote_columns parameter was not set for seeds, so the
+default value of False was chosen. The default will change to True in a future
+release.
+
+For more information, see:
+https://docs.getdbt.com/v0.15/docs/seeds#section-specify-column-quoting
+10:39:28 | 4 of 12 OK created table model mikko_stg.stg_customer................ [SUCCESS 1 in 6.26s]
+10:39:28 | 8 of 12 START test not_null_part_p_partkey........................... [RUN]
+10:39:30 | 7 of 12 OK loaded seed file mikko_ref.region......................... [INSERT 5 in 2.72s]
+10:39:30 | 9 of 12 START test unique_part_p_partkey............................. [RUN]
+10:39:30 | 8 of 12 PASS not_null_part_p_partkey................................. [PASS in 1.82s]
+10:39:30 | 10 of 12 START view model mikko_publish.lineitem..................... [RUN]
+10:39:31 | 9 of 12 PASS unique_part_p_partkey................................... [PASS in 1.59s]
+10:39:31 | 11 of 12 START table model mikko_publish.customer.................... [RUN]
+10:39:32 | 10 of 12 OK created view model mikko_publish.lineitem................ [SUCCESS 1 in 1.72s]
+10:39:37 | 11 of 12 OK created table model mikko_publish.customer............... [SUCCESS 1 in 5.52s]
+10:39:37 | 12 of 12 START test relationships_orders_o_custkey__c_custkey__ref_customer_ [RUN]
+10:39:38 | 12 of 12 PASS relationships_orders_o_custkey__c_custkey__ref_customer_ [PASS in 1.42s]
+10:39:38 | 
+10:39:38 | Finished running 6 view models, 2 table models, 1 seed, 3 tests in 24.23s.
+
+Completed successfully
+
+Done. PASS=12 WARN=0 ERROR=0 SKIP=0 TOTAL=12
+```
+
+Verify from Snowflake.
+
+Congrats! That's it. You just deployed everything to prod (given that we already had the same src-tables in place...).
+
 ### Expanding on what we did, and other nice stuff to mention
+#### Macros, hooks
 
-#### Snapshots
+https://docs.getdbt.com/docs/building-a-dbt-project/jinja-macros
 
-#### Hooks
+https://github.com/mikkosulonen/dbt_helpers
 
-#### Macros
 
 #### Packages
 
+https://hub.getdbt.com/
+
+https://hub.getdbt.com/dbt-labs/dbt_utils/latest/
+
+https://hub.getdbt.com/dbt-labs/dbt_external_tables/latest/
+
+https://hub.getdbt.com/calogica/dbt_expectations/latest/
 #### Exposures
 
+https://docs.getdbt.com/docs/building-a-dbt-project/exposures
+
 #### Analyses
+
+https://docs.getdbt.com/docs/building-a-dbt-project/analyses
