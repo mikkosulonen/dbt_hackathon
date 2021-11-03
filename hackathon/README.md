@@ -22,6 +22,7 @@ This is the main folder what you should be looking at while doing. This README.m
       - [Packages](#packages)
       - [Exposures](#exposures)
       - [Analyses](#analyses)
+    - [Running dbt in production](#running-dbt-in-production)
 
 ## Business case
 
@@ -737,7 +738,7 @@ Done. PASS=12 WARN=0 ERROR=0 SKIP=0 TOTAL=12
 
 Verify from Snowflake.
 
-Congrats! That's it. You just deployed everything to prod (given that we already had the same src-tables in place...).
+Congrats! That's it. You just "deployed" everything to prod (given that we already had the same src-tables in place...).
 
 ### Expanding on what we did, and other nice stuff to mention
 #### Macros, hooks
@@ -763,3 +764,7 @@ https://docs.getdbt.com/docs/building-a-dbt-project/exposures
 #### Analyses
 
 https://docs.getdbt.com/docs/building-a-dbt-project/analyses
+
+### Running dbt in production
+
+This was all about developing with dbt more or less locally. How to run dbt in a project? Discussion.
